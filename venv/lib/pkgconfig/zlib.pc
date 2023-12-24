@@ -1,0 +1,13 @@
+prefix=/Users/muhammadhassaan/Downloads/ifti/venv
+exec_prefix=/Users/muhammadhassaan/Downloads/ifti/venv
+libdir=/Users/muhammadhassaan/Downloads/ifti/venv/lib
+sharedlibdir=/Users/muhammadhassaan/Downloads/ifti/venv/lib
+includedir=/Users/muhammadhassaan/Downloads/ifti/venv/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.13
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
