@@ -4,14 +4,16 @@ from PIL import Image
 import os
 from vertexai.preview.generative_models import GenerativeModel
 from dotenv import load_dotenv
+import  uvicorn
+import re
+import json
 
 load_dotenv()
-
 app = FastAPI()
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GENERATIVE_MODEL_NAME = "gemini-1.0-pro-vision"
-def configure_genai(api_key)
+def configure_genai(api_key):
     """
     :param api_key: from google vertex api (Gcloud)
     :return: none
@@ -26,7 +28,7 @@ def generate_content(image_filename):
     """
     gemini_pro_vision_model = GenerativeModel(GENERATIVE_MODEL_NAME)
     model_response = gemini_pro_vision_model.generate_content(["what is this image title? and description and category and estimate price", image_filename])
-    print(model_response)
+
     return model_response.text
 
 @app.post("/generate")
@@ -40,6 +42,21 @@ async def generate_image_content(image: UploadFile = File(...)):
 
     configure_genai(GOOGLE_API_KEY)
     model_text = generate_content(image.filename)
-    print(model_text)
-    return {"response": model_text}
+
+    # print the gemini res into json
+    data = {}
+    lines = model_text.split("\n")
+    for i, line in enumerate(lines):
+        line = line.strip()
+        if ":" in line:  # Check for colon delimiter
+            parts = line.split(":")
+            key = parts[0].strip().replace("**", "")
+            value = parts[1].strip().replace("**", "")
+            data[key] = value
+    json_string = json.dumps(data)
+    return  json_string
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  # Default to 8000
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
